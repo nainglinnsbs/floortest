@@ -15,9 +15,12 @@ abstract class ToDoDao {
   @Query("DELETE FROM ToDo WHERE id = :id")
   Future<void> deleteTodo(int id);
 
-  // @delete
-  // Future<void> deleteAllTodo(List<ToDo> list);
-
   @Query('DELETE FROM ToDO')
   Future<void> deleteAllTodo();
+
+  @update
+  Future<void> updateToDo(ToDo toDo);
+
+  @delete
+  Future<void> deleteToDo(ToDo toDo);
 }

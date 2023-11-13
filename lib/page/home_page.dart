@@ -56,31 +56,44 @@ class _MyHomePageState extends State<MyHomePage> {
                 // ignore: unnecessary_null_comparison
                 itemCount: listToDo != null ? listToDo.length : 0,
                 itemBuilder: (context, index) {
-                  return const Slidable(
-                    key: ValueKey(0),
-                    // startActionPane: ActionPane(
-                    //   motion: ScrollMotion(),
-                    //   children: [
-                    //     SlidableAction(
-                    //       onPressed: () {},
-                    //       backgroundColor: Color(0xFFFE4A49),
-                    //       foregroundColor: Colors.white,
-                    //       icon: Icons.delete,
-                    //       label: 'Delete',
-                    //     ),
-                    //     SlidableAction(
-                    //       onPressed: doNothing,
-                    //       backgroundColor: Color(0xFF21B7CA),
-                    //       foregroundColor: Colors.white,
-                    //       icon: Icons.share,
-                    //       label: 'Share',
-                    //     ),
-                    //   ],
-                    // ),
+                  return Slidable(
+                    endActionPane: ActionPane(
+                      motion: const ScrollMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (BuildContext context) async {
+                            final deleteToDo = listToDo[index];
+                            await widget.dao.deleteToDo(deleteToDo);
+                          },
+                          backgroundColor: const Color(0xFFFE4A49),
+                          foregroundColor: Colors.white,
+                          icon: Icons.delete,
+                          label: 'Delete',
+                        ),
+                        SlidableAction(
+                          onPressed: (BuildContext context) async {
+                            final updateToDo = listToDo[index];
+                            updateToDo.task =
+                                Faker().person.firstName().toString();
+                            updateToDo.time =
+                                Faker().person.lastName().toString();
+                            updateToDo.scheduleTime =
+                                Faker().internet.email().toString();
+
+                            await widget.dao.updateToDo(updateToDo);
+                          },
+                          backgroundColor: const Color(0xFF21B7CA),
+                          foregroundColor: Colors.white,
+                          icon: Icons.update,
+                          label: 'Update',
+                        ),
+                      ],
+                    ),
                     child: ListTile(
-                      contentPadding: EdgeInsets.only(left: 20),
+                      contentPadding: const EdgeInsets.only(left: 20),
                       tileColor: Colors.black12,
-                      title: Text("hello"),
+                      title: Text("Test Name : ${listToDo[index].task}"),
+                      subtitle: Text("Time : ${listToDo[index].time}"),
                     ),
                   );
                 },

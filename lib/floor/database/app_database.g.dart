@@ -113,6 +113,28 @@ class _$ToDoDao extends ToDoDao {
                   'time': item.time,
                   'scheduleTime': item.scheduleTime
                 },
+            changeListener),
+        _toDoUpdateAdapter = UpdateAdapter(
+            database,
+            'ToDo',
+            ['id'],
+            (ToDo item) => <String, Object?>{
+                  'id': item.id,
+                  'task': item.task,
+                  'time': item.time,
+                  'scheduleTime': item.scheduleTime
+                },
+            changeListener),
+        _toDoDeletionAdapter = DeletionAdapter(
+            database,
+            'ToDo',
+            ['id'],
+            (ToDo item) => <String, Object?>{
+                  'id': item.id,
+                  'task': item.task,
+                  'time': item.time,
+                  'scheduleTime': item.scheduleTime
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -122,6 +144,10 @@ class _$ToDoDao extends ToDoDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<ToDo> _toDoInsertionAdapter;
+
+  final UpdateAdapter<ToDo> _toDoUpdateAdapter;
+
+  final DeletionAdapter<ToDo> _toDoDeletionAdapter;
 
   @override
   Stream<List<ToDo>> findAllToDo() {
@@ -156,5 +182,15 @@ class _$ToDoDao extends ToDoDao {
   Future<List<int>> insertAllToDo(List<ToDo> toDo) {
     return _toDoInsertionAdapter.insertListAndReturnIds(
         toDo, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateToDo(ToDo toDo) async {
+    await _toDoUpdateAdapter.update(toDo, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteToDo(ToDo toDo) async {
+    await _toDoDeletionAdapter.delete(toDo);
   }
 }
