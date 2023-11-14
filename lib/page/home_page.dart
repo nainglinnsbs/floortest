@@ -26,18 +26,48 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {
                 final toDo = ToDo(
                   task: Faker().person.firstName().toString(),
-                  time: Faker().date.toString(),
+                  time: Faker().date.time(),
                   scheduleTime: Faker().date.toString(),
                 );
                 await widget.dao.insertTodo(toDo);
+                setState(() {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        "Created New Item",
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      backgroundColor: Colors.grey.shade200,
+                      duration: const Duration(
+                        milliseconds: 1000,
+                      ),
+                      showCloseIcon: true,
+                    ),
+                  );
+                });
               },
               icon: const Icon(Icons.add)),
           IconButton(
               onPressed: () async {
                 widget.dao.deleteAllTodo();
-                // setState(() {
-                //   showSnackBar(scaffoldKey.currentState, 'Clear Success');
-                // });
+                setState(() {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        "Deleted all items",
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      backgroundColor: Colors.grey.shade200,
+                      duration: const Duration(
+                        milliseconds: 1000,
+                      ),
+                    ),
+                  );
+                });
               },
               icon: const Icon(Icons.clear)),
         ],
@@ -52,48 +82,99 @@ class _MyHomePageState extends State<MyHomePage> {
           } else if (snapshot.hasData) {
             var listToDo = snapshot.data as List<ToDo>;
             return Container(
+              color: Colors.white,
+              margin: const EdgeInsets.only(bottom: 15.0),
               child: ListView.builder(
                 // ignore: unnecessary_null_comparison
                 itemCount: listToDo != null ? listToDo.length : 0,
                 itemBuilder: (context, index) {
-                  return Slidable(
-                    endActionPane: ActionPane(
-                      motion: const ScrollMotion(),
-                      children: [
-                        SlidableAction(
-                          onPressed: (BuildContext context) async {
-                            final deleteToDo = listToDo[index];
-                            await widget.dao.deleteToDo(deleteToDo);
-                          },
-                          backgroundColor: const Color(0xFFFE4A49),
-                          foregroundColor: Colors.white,
-                          icon: Icons.delete,
-                          label: 'Delete',
-                        ),
-                        SlidableAction(
-                          onPressed: (BuildContext context) async {
-                            final updateToDo = listToDo[index];
-                            updateToDo.task =
-                                Faker().person.firstName().toString();
-                            updateToDo.time =
-                                Faker().person.lastName().toString();
-                            updateToDo.scheduleTime =
-                                Faker().internet.email().toString();
+                  return Container(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Slidable(
+                      direction: Axis.horizontal,
+                      endActionPane: ActionPane(
+                        motion: const BehindMotion(),
+                        children: [
+                          SlidableAction(
+                            borderRadius: BorderRadius.circular(10.0),
+                            onPressed: (BuildContext context) async {
+                              final deleteToDo = listToDo[index];
+                              await widget.dao.deleteToDo(deleteToDo);
+                              setState(() {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      "Deleted Item",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.grey.shade200,
+                                    duration: const Duration(
+                                      milliseconds: 1000,
+                                    ),
+                                  ),
+                                );
+                              });
+                            },
+                            backgroundColor: const Color(0xFFFE4A49),
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: 'Delete',
+                          ),
+                          const SizedBox(
+                            width: 5.0,
+                          ),
+                          SlidableAction(
+                            padding: const EdgeInsets.all(10.0),
+                            borderRadius: BorderRadius.circular(10.0),
+                            onPressed: (BuildContext context) async {
+                              final updateToDo = listToDo[index];
+                              updateToDo.task =
+                                  Faker().person.firstName().toString();
+                              updateToDo.time = Faker().date.time();
+                              updateToDo.scheduleTime =
+                                  Faker().internet.email().toString();
 
-                            await widget.dao.updateToDo(updateToDo);
-                          },
-                          backgroundColor: const Color(0xFF21B7CA),
-                          foregroundColor: Colors.white,
-                          icon: Icons.update,
-                          label: 'Update',
+                              await widget.dao.updateToDo(updateToDo);
+                              setState(() {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      "Updated Item",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.grey.shade200,
+                                    duration: const Duration(
+                                      milliseconds: 1000,
+                                    ),
+                                  ),
+                                );
+                              });
+                            },
+                            backgroundColor: const Color(0xFF21B7CA),
+                            foregroundColor: Colors.white,
+                            icon: Icons.update,
+                            label: 'Update',
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade200,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10.0)),
                         ),
-                      ],
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      tileColor: Colors.black12,
-                      title: Text("Test Name : ${listToDo[index].task}"),
-                      subtitle: Text("Time : ${listToDo[index].time}"),
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.only(left: 10),
+                          tileColor: Colors.black12,
+                          title: Text("Test Name : ${listToDo[index].task}"),
+                          subtitle: Text("Time : ${listToDo[index].time}"),
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -108,12 +189,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  // void showSnackBar(ScaffoldState? currentState, String s) {
-  //   final snackBar = SnackBar(
-  //     content: Text(s),
-  //     duration: const Duration(seconds: 1),
-  //   );
-  //   currentState!.showSnackBar(snackBar);
-  // }
 }
